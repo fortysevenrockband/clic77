@@ -140,32 +140,46 @@
     var blinkInterval;
     var audio;
     var isRunning = false;
-
+    var startTime;
+    var interval;
+    
     function startMetronome() {
         var bpm = parseInt(document.getElementById('bpm').value, 10);
         if (isNaN(bpm) || bpm <= 0) {
             alert('Bitte geben Sie eine gültige BPM ein.');
             return;
         }
-        var interval = 60000 / bpm;
-        
+        interval = 60000 / bpm;
+
         stopMetronome();
 
-        metronomeInterval = setInterval(function() {
+        startTime = performance.now();
+        requestAnimationFrame(tick);
+    }
+
+    function tick(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var elapsed = timestamp - startTime;
+
+        if (elapsed >= interval) {
             audio.currentTime = 0;
             audio.play().catch(error => {
                 console.error('Fehler beim Abspielen des Tons:', error);
             });
-        }, interval);
+            startTime = timestamp - (elapsed % interval);
+        }
 
         blinkInterval = setInterval(function() {
             var blinker = document.getElementById('blinker');
             blinker.style.opacity = (blinker.style.opacity == 1 ? 0 : 1);
         }, interval / 2);
+
+        if (isRunning) {
+            requestAnimationFrame(tick);
+        }
     }
 
     function stopMetronome() {
-        clearInterval(metronomeInterval);
         clearInterval(blinkInterval);
         document.getElementById('blinker').style.opacity = 1;
     }
