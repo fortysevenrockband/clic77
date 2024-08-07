@@ -217,8 +217,20 @@
     }
 
     window.onload = function() {
-        document.getElementById('bpm').value = 120; // Set default BPM if necessary
+        var bpm = getBPMFromURL();
+        if (bpm) {
+            setBPM(bpm);
+            document.getElementById('start-stop-button').innerText = 'Stop';
+            startMetronome();
+            isRunning = true;
+        }
     };
+
+    function getBPMFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bpm = urlParams.get('bpm');
+        return bpm ? parseInt(bpm, 10) : null;
+    }
     </script>
 </body>
 </html>
