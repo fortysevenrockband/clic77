@@ -136,13 +136,14 @@
     </div>
 
     <script>
-    var metronomeInterval;
-    var blinkInterval;
-    var audio;
+    var audioContext;
+    var oscillator;
     var isRunning = false;
     var startTime;
     var interval;
-    
+    var blinkInterval;
+    var audio = document.getElementById('metronome-sound');
+
     function startMetronome() {
         var bpm = parseInt(document.getElementById('bpm').value, 10);
         if (isNaN(bpm) || bpm <= 0) {
@@ -154,6 +155,7 @@
         stopMetronome();
 
         startTime = performance.now();
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         requestAnimationFrame(tick);
     }
 
@@ -162,21 +164,20 @@
         var elapsed = timestamp - startTime;
 
         if (elapsed >= interval) {
-            audio.currentTime = 0;
-            audio.play().catch(error => {
-                console.error('Fehler beim Abspielen des Tons:', error);
-            });
+            playSound();
             startTime = timestamp - (elapsed % interval);
         }
-
-        blinkInterval = setInterval(function() {
-            var blinker = document.getElementById('blinker');
-            blinker.style.opacity = (blinker.style.opacity == 1 ? 0 : 1);
-        }, interval / 2);
 
         if (isRunning) {
             requestAnimationFrame(tick);
         }
+    }
+
+    function playSound() {
+        audio.currentTime = 0;
+        audio.play().catch(error => {
+            console.error('Fehler beim Abspielen des Tons:', error);
+        });
     }
 
     function stopMetronome() {
