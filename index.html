@@ -45,7 +45,7 @@
             height: 80px;
             background-color: red;
             border-radius: 50%;
-            opacity: 1;
+            opacity: 0;
             transition: opacity 0.1s;
             display: inline-block;
             vertical-align: middle;
@@ -136,13 +136,11 @@
     </div>
 
     <script>
-    var audioContext;
-    var oscillator;
-    var isRunning = false;
-    var startTime;
-    var interval;
-    var blinkInterval;
     var audio = document.getElementById('metronome-sound');
+    var blinkInterval;
+    var isRunning = false;
+    var interval;
+    var lastTime = 0;
 
     function startMetronome() {
         var bpm = parseInt(document.getElementById('bpm').value, 10);
@@ -150,27 +148,26 @@
             alert('Bitte geben Sie eine gültige BPM ein.');
             return;
         }
+        
         interval = 60000 / bpm;
-
+        lastTime = performance.now();
+        
         stopMetronome();
-
-        startTime = performance.now();
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
         requestAnimationFrame(tick);
     }
 
-    function tick(timestamp) {
-        if (!startTime) startTime = timestamp;
-        var elapsed = timestamp - startTime;
+    function tick(now) {
+        if (!isRunning) return;
 
-        if (elapsed >= interval) {
+        var delta = now - lastTime;
+        
+        if (delta >= interval) {
             playSound();
-            startTime = timestamp - (elapsed % interval);
+            blink();
+            lastTime = now - (delta % interval);
         }
-
-        if (isRunning) {
-            requestAnimationFrame(tick);
-        }
+        
+        requestAnimationFrame(tick);
     }
 
     function playSound() {
@@ -180,13 +177,21 @@
         });
     }
 
-    function stopMetronome() {
-        clearInterval(blinkInterval);
-        document.getElementById('blinker').style.opacity = 1;
+    function blink() {
+        var blinker = document.getElementById('blinker');
+        blinker.style.opacity = blinker.style.opacity === '1' ? '0' : '1';
+        setTimeout(() => {
+            blinker.style.opacity = blinker.style.opacity === '1' ? '0' : '1';
+        }, interval / 2);
     }
 
-    function setBPM(bpm) {
-        document.getElementById('bpm').value = bpm;
+    function stopMetronome() {
+        clearTimeout(blinkInterval);
+        document.getElementById('blinker').style.opacity = 0;
+    }
+
+    function setBPM(bpmValue) {
+        document.getElementById('bpm').value = bpmValue;
         if (isRunning) {
             startMetronome();
         }
@@ -212,18 +217,8 @@
     }
 
     window.onload = function() {
-        audio = document.getElementById('metronome-sound');
-        var bpm = getBPMFromURL();
-        if (bpm) {
-            setBPM(bpm);
-        }
+        document.getElementById('bpm').value = 120; // Set default BPM if necessary
     };
-
-    function getBPMFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bpm = urlParams.get('bpm');
-        return bpm ? parseInt(bpm, 10) : null;
-    }
     </script>
 </body>
 </html>
