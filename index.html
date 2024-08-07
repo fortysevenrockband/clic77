@@ -233,26 +233,9 @@
         audio = document.getElementById('metronome-' + sound);
     }
 
-    function attemptAutoplay() {
-        var bpm = getBPMFromURL();
-        if (bpm) {
-            setBPM(bpm);
-            document.getElementById('start-stop-button').innerText = 'Stop';
-            setTimeout(startMetronome, 1000);
-            isRunning = true;
-        }
-    }
-
     window.onload = function() {
         setSound(currentSound);
-        attemptAutoplay();
     };
-
-    function getBPMFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const bpm = urlParams.get('bpm');
-        return bpm ? parseInt(bpm, 10) : null;
-    }
     </script>
 </body>
 </html>
