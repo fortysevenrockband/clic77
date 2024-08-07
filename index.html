@@ -89,20 +89,6 @@
         .start-stop-button:hover {
             background-color: #218838;
         }
-        .sound-button {
-            background-color: #ffc107;
-            border: none;
-            border-radius: 10px;
-            color: black;
-            padding: 20px 30px;
-            margin: 20px;
-            cursor: pointer;
-            font-size: 24px;
-            transition: background-color 0.3s;
-        }
-        .sound-button:hover {
-            background-color: #e0a800;
-        }
         @media (max-width: 600px) {
             button {
                 padding: 24px;
@@ -122,28 +108,14 @@
                 height: 160px;
                 font-size: 36px;
             }
-            .sound-button {
-                padding: 16px 24px;
-                font-size: 20px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <audio id="metronome-click">
-            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.mp3" type="audio/mp3">
-            <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+        <audio id="metronome-sound">
+            <source src="beep_short.mp3" type="audio/mp3">
             Dein Browser unterstützt das Audio-Format nicht.
-        </audio>
-        <audio id="metronome-cowbell">
-            <source src="https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.mp3" type="audio/mp3">
-            <source src="https://actions.google.com/sounds/v1/cartoon/cartoon_cowbell.ogg" type="audio/ogg">
-        </audio>
-        <audio id="metronome-clang">
-            <source src="http://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/alien_hit.wav" type="audio/wav">
-            <source src="https://actions.google.com/sounds/v1/cartoon/pop.mp3?hl=de" type="audio/mp3">
-            <source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg?hl=de" type="audio/ogg">
         </audio>
         <h1>FORTYSEVEN!</h1>
         <div style="display: flex; align-items: center; justify-content: center;">
@@ -160,13 +132,6 @@
                 <button onclick="changeBPM(5)">+5 BPM</button>
             </div>
         </div>
-        <div class="button-group">
-            <div class="button-row">
-                <button class="sound-button" onclick="setSound('click')">Beep</button>
-                <button class="sound-button" onclick="setSound('cowbell')">Cowbell</button>
-                <button class="sound-button" onclick="setSound('clang')">Clang</button>
-            </div>
-        </div>
         <button id="start-stop-button" class="start-stop-button" onclick="toggleMetronome()">Start</button>
     </div>
 
@@ -175,7 +140,6 @@
     var blinkInterval;
     var audio;
     var isRunning = false;
-    var currentSound = 'click';
 
     function startMetronome() {
         var bpm = parseInt(document.getElementById('bpm').value, 10);
@@ -208,7 +172,6 @@
 
     function setBPM(bpm) {
         document.getElementById('bpm').value = bpm;
-        // Wenn der Metronom gerade läuft, aktualisiere den Intervall.
         if (isRunning) {
             startMetronome();
         }
@@ -233,13 +196,8 @@
         isRunning = !isRunning;
     }
 
-    function setSound(sound) {
-        currentSound = sound;
-        audio = document.getElementById('metronome-' + sound);
-    }
-
     window.onload = function() {
-        setSound(currentSound);
+        audio = document.getElementById('metronome-sound');
         var bpm = getBPMFromURL();
         if (bpm) {
             setBPM(bpm);
