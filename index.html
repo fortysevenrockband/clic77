@@ -204,6 +204,7 @@
 
     function setBPM(bpm) {
         document.getElementById('bpm').value = bpm;
+        // Wenn der Metronom gerade läuft, aktualisiere den Intervall.
         if (isRunning) {
             startMetronome();
         }
@@ -235,7 +236,17 @@
 
     window.onload = function() {
         setSound(currentSound);
+        var bpm = getBPMFromURL();
+        if (bpm) {
+            setBPM(bpm);
+        }
     };
+
+    function getBPMFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bpm = urlParams.get('bpm');
+        return bpm ? parseInt(bpm, 10) : null;
+    }
     </script>
 </body>
 </html>
